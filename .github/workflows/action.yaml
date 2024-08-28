@@ -56,17 +56,24 @@ jobs:
     - name: Run tests with coverage
       run: go test -v -coverprofile=coverage.out ./...
 
-    - name: Generate coverage badge
+    - name: Extract coverage percentage
+      id: coverage
       run: |
-        go-coverage -input coverage.out -output coverage.svg
+        grep -o '^[^:]*' coverage.out | awk '{s+=$1} END {print s/NR}' > coverage.txt
+        coverage=$(cat coverage.txt)
+        echo "::set-output name=coverage::$coverage"
 
-    - name: Deploy coverage badge to GitHub Pages
+    - name: Update Shields.io badge
+      run: |
+        curl -o coverage-badge.svg "https://img.shields.io/badge/Coverage-${{ steps.coverage.outputs.coverage }}%25-brightgreen"
+
+    - name: Commit coverage badge
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
-        git add coverage.svg
+        git add coverage-badge.svg
         git commit -m "Update coverage badge"
-        git push origin main:gh-pages
+        git push origin main
 
   build:
     runs-on: ubuntu-latest
