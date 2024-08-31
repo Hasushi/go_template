@@ -3,6 +3,7 @@ package constructor
 import (
 	"go_template/domain/entity"
 	"go_template/domain/entity_const"
+	"go_template/domain/validations"
 )
 
 
@@ -14,13 +15,13 @@ type NewUserDetailCreateArgs struct {
 
 func NewUserDetailCreate(args NewUserDetailCreateArgs) (entity.UserDetail, error) {
 	if args.UserDetailID == "" {
-		return entity.UserDetail{}, entity_const.ErrInvalidUserDetailID
+		return entity.UserDetail{}, validations.ErrInvalidUserDetailID
 	}
 	if args.UserID == "" {
-		return entity.UserDetail{}, entity_const.ErrInvalidUserID
+		return entity.UserDetail{}, validations.ErrInvalidUserID
 	}
 	if args.Name == "" {
-		return entity.UserDetail{}, entity_const.ErrInvalidName
+		return entity.UserDetail{}, validations.ErrInvalidName
 	}
 	
 	return entity.UserDetail{
@@ -32,22 +33,34 @@ func NewUserDetailCreate(args NewUserDetailCreateArgs) (entity.UserDetail, error
 	
 type NewUserCreateArgs struct {
 	UserID string
+	UserDetailID string
 	Email string
+	Password string
 	HashedPassword string
 	UserType string
+	Name string
 }
 
 func NewUserCreate(args NewUserCreateArgs) (entity.User, error) {
-	if args.UserID == "" {
-		return entity.User{}, entity_const.ErrInvalidUserID
+	if err := validations.ValidateEmail(args.Email); err != nil {
+		return entity.User{}, err
 	}
-	if args.Email == "" {
-		return entity.User{}, entity_const.ErrInvalidEmail
+
+	if err := validations.ValidatePassword(args.Password); err != nil {
+		return entity.User{}, err
 	}
-	if args.HashedPassword == "" {
-		return entity.User{}, entity_const.ErrInvalidHashedPassword
+
+	userType, err := entity_const.UserTypeFromString(args.UserType)
+	if err != nil {
+		return entity.User{}, err
 	}
-	if _, err := entity_const.UserTypeFromString(args.UserType); err != nil {
+
+	udCreated, err := NewUserDetailCreate(NewUserDetailCreateArgs{
+		UserDetailID: args.UserDetailID,
+		UserID: args.UserID,
+		Name: args.Name,
+	})
+	if err != nil {
 		return entity.User{}, err
 	}
 	
@@ -55,6 +68,7 @@ func NewUserCreate(args NewUserCreateArgs) (entity.User, error) {
 		UserID: args.UserID,
 		Email: args.Email,
 		HashedPassword: args.HashedPassword,
-		UserType: entity_const.UserType(args.UserType),
-		}, nil
+		UserType: *userType,
+		UserDetail: &udCreated,
+	}, nil
 }
