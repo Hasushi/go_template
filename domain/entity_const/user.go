@@ -1,12 +1,7 @@
 package entity_const
 
 var (
-	ErrInvalidUserType = NewValidationError("invalid user type")
-	ErrInvalidUserID = NewValidationError("invalid user id")
-	ErrInvalidEmail = NewValidationError("invalid email")
-	ErrInvalidHashedPassword = NewValidationError("invalid hashed password")
-	ErrInvalidUserDetailID = NewValidationError("invalid user detail id")
-	ErrInvalidName = NewValidationError("invalid name")
+	ErrInvalidUserType = NewValidationErrorFromMsg("invalid user type")
 )
 
 type UserType string
