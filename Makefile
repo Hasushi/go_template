@@ -20,3 +20,8 @@ format-init: tools
 .PHONY: format
 format:
 	golangci-lint run ./... --fix
+
+.PHONY: coverage
+coverage:
+	go test -coverprofile=coverage.out ./...
+	go tool cover -html=coverage.out
