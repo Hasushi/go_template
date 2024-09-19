@@ -2,7 +2,23 @@ package output_port
 
 import (
 	"go_template/domain/entity"
+	"go_template/domain/entity_const"
 	"time"
+)
+
+var (
+	TokenScopeGeneral                 = "general"
+	TokenGeneralExpireDuration        = 7 * 24 * time.Hour // 7 days
+	TokenScopeUpdateEmail             = "updateEmail"
+	TokenEmailUpdateExpireDuration    = 24 * time.Hour // 1 day
+	TokenScopeUpdatePassword          = "updatePassword"
+	TokenChangePasswordExpireDuration = 24 * time.Hour // 1 day
+	TokenForgetPasswordExpireDuration = 1 * time.Hour  // 1 hour
+	ErrUnknownScope                   = entity_const.NewValidationErrorFromMsg("unknown scope")
+	ErrTokenExpired                   = entity_const.NewValidationErrorFromMsg("token expired")
+	ErrTokenIssuedFutureTime          = entity_const.NewValidationErrorFromMsg("token issued future time")
+	ErrTokenScopeInvalid              = entity_const.NewValidationErrorFromMsg("token scope invalid")
+	ErrUserNotFound                   = entity_const.NewNotFoundErrorFromMsg("user not found")
 )
 
 type UserAuth interface {
