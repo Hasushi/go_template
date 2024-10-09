@@ -132,3 +132,11 @@ func FrontendURL() string {
 func SlowQueryThresholdMilliSecond() int64 {
 	return slowQueryThresholdMilliSecond
 }
+
+func DBMaxIdleConns() int {
+	return 100
+}
+
+func DBMaxOpenConns() int {
+	return 100
+}
